@@ -1,0 +1,125 @@
+.button {
+
+  border-radius: 12px;
+  background: white;
+  border: 2.5px solid #FFD500;
+  text-align: center;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.button:hover {
+	background: #FFD500;
+	outline: medium none;
+	cursor: pointer;
+}
+
+.button1 {
+	width: 150px;
+	height: 75px;
+	margin-bottom: 3px;
+}
+
+@media screen and (max-width: 700px){
+	.button1 {
+		width: 125px;
+		height: 60px;	
+	}
+}
+
+.button2 {
+	margin-top: 10px;
+	width: 125px;
+	height: 65px;
+}
+
+@media screen and (max-width: 700px){
+	.button2 {
+		width: 100px;
+		height: 55px;
+	}
+}
+
+
+
+.outer {
+  display: table;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}
+
+.middle {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.main {
+	background-color: white;
+	background: white;
+	text-align: center;
+	border: 2px solid #494A4A;
+  	border-radius: 25px;
+	margin-left: auto;
+  	margin-right: auto;
+}
+
+@media screen and (max-width: 700px){
+	.main {
+		width: 85%;
+		padding-top: 10px;
+		padding-bottom: 8px;
+	}
+}
+
+@media screen and (min-width: 700px) and (max-width: 1000px){
+	.main {
+		width: 65%;
+		padding-top: 17px;
+		padding-bottom: 18px;
+	}
+}
+
+@media screen and (min-width: 1000px){
+	.main {
+		width: 40%;	
+		padding-top: 22px;
+		padding-bottom: 26px;
+	}
+}
+
+
+@media screen and (max-width: 700px){
+	img.logo {
+		max-width: 83%;
+    		padding-bottom: 12px;
+	}
+}
+
+@media screen and (min-width:700px) and (max-width: 1000px){
+	img.logo {
+		max-width: 70%;
+    		padding-bottom: 15px;
+	}
+}
+
+@media screen and (min-width: 1000px){
+	img.logo {
+    		max-width: 60%;
+		padding-bottom: 20px;
+	}
+}
+
+img.filebutton{
+	max-width: 100%;
+	max-height: 100%;
+}
+
+img.chatbutton{
+	max-width: 100%;
+	max-height: 100%;
+}
+
+body{
+background-color:#494A4A
+}

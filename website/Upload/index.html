@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<!-- Include our stylesheet -->
+	<link href="assets/css/styles.css" rel="stylesheet"/>
+	<link href="assets/css/bootstrap.min.css" rel="stylesheet"/>
+	<link href="assets/css/my.css" rel="stylesheet"/>
+	<script src="resumable.js"></script>
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/jquery.mobile.min.js"></script>
+
+<style>
+.inputfile {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+
+.inputfile + label {
+    color: white;
+    background-color: white;
+    display: inline-block;
+}
+
+.inputfile:focus + label,
+.inputfile + label:hover {
+    background-color: #FFD500;
+}
+
+.inputfile + label {
+	cursor: pointer; /* "hand" cursor */
+}
+
+.inputfile:focus + label {
+	outline: 1px dotted #000;
+	outline: -webkit-focus-ring-color auto 5px;
+}
+
+.inputfile + label img {
+    width: 100px;
+    vertical-align: middle;
+    fill: currentColor;
+    margin-top: -0.25em;
+    margin-right: 0.25em;
+    margin-left: 0.25em;
+    /* 4px */
+    padding: 10px;
+}
+
+</style>
+
+</head>
+<body>
+
+<script>
+	function dragOver(){
+		document.getElementById("dragOver").style.backgroundColor = "#FFEE97";
+	}
+	function dragOff(){
+		document.getElementById("dragOver").style.backgroundColor = "white";
+	}
+	function dragDrop(){
+		document.getElementById("dragOver").style.backgroundColor = "white";
+	}
+</script>
+
+
+	
+
+<div class="outer">
+  		<div class="middle">
+			<div class="main mainFile" style="text-align:left">
+					
+					<div class="row" >
+						<div class="column left1" style="text-align:left">
+							<span onclick="goBack()" class="glyphicon glyphicon-chevron-left" style="padding-left: 10px"></span>
+						</div>
+					</div>
+
+	<div class="resumable-drop" id="dragOver" ondragover="dragOver()" ondragleave="dragOff()" ondrop="dragDrop()">
+        	<input type="file" name="file-2[]" id="file-2" class="inputfile inputfile-2" data-multiple-caption="{count} files selected" multiple />
+		<label for="file-2"><img src="assets/img/upload_button.png"></img></label>
+	</div>
+
+      <div class="resumable-progress">
+        <table>
+          <tr>
+            <td width="100%"><div class="progress-container"><div class="progress-bar"></div></div></td>
+		<td width="100%"><progress id="progressBar" value="0" max="100" style="float: left; width: 100%; display:none"></progress></td>
+            <td class="progress-text" nowrap="nowrap" style="margin"></td>
+            <td class="progress-pause" nowrap="nowrap">
+              <a href="#" onclick="r.upload(); return(false);" class="progress-resume-link"><img src="assets/img/resume.png" title="Resume upload" /></a>
+              <a href="#" onclick="r.pause(); return(false);" class="progress-pause-link"><img src="assets/img/pause.png" title="Pause upload" /></a>
+              <a href="#" onclick="r.cancel(); return(false);" class="progress-cancel-link"><img src="assets/img/cancel.png" title="Cancel upload" /></a>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <ul class="resumable-list" style="2px solid black"></ul>
+
+      <script>
+        var r = new Resumable({
+            target:'upload.php',
+            chunkSize:1*1024*1024,
+            simultaneousUploads:4,
+            testChunks:false,
+            throttleProgressCallbacks:1
+          });
+        // Resumable.js isn't supported, fall back on a different method
+        if(!r.support) {
+          $('.resumable-error').show();
+        } else {
+          // Show a place for dropping/selecting files
+          $('.resumable-drop').show();
+          r.assignDrop($('.resumable-drop')[0]);
+          r.assignBrowse($('.inputfile')[0]);
+          // Handle file add event
+          r.on('fileAdded', function(file){
+			$('.resumable-progress, .resumable-list').show();
+              		// Show pause, hide resume
+              		$('.resumable-progress .progress-resume-link').hide();
+              		$('.resumable-progress .progress-pause-link').show();
+              		// Add the file to the list
+              		$('.resumable-list').append('<li class="resumable-file-'+file.uniqueIdentifier+'"><span class="glyphicon glyphicon-cloud-upload" style="margin-left: 15px; margin-right: 15px"></span><span class="resumable-file-name"></span>&nbsp;&nbsp;&nbsp;<span class="resumable-file-progress" style="text-align: right"></span>');
+              		$('.resumable-file-'+file.uniqueIdentifier+' .resumable-file-name').html(file.fileName);
+              		// Actually start the upload
+              		r.upload();
+              
+            });
+          r.on('pause', function(){
+              // Show resume, hide pause
+              $('.resumable-progress .progress-resume-link').show();
+              $('.resumable-progress .progress-pause-link').hide();
+            });
+          r.on('complete', function(){
+              // Hide pause/resume when the upload has completed
+              $('.resumable-progress .progress-resume-link, .resumable-progress .progress-pause-link').hide();
+            });
+          r.on('fileSuccess', function(file,message){
+              // Reflect that the file upload has completed
+              	$('.resumable-file-'+file.uniqueIdentifier+' .resumable-file-progress').html('(completed)');
+		setTimeout(function(){
+    			window.location.reload();
+		}, 2000);
+            });
+          r.on('fileError', function(file, message){
+              // Reflect that the file upload has resulted in error
+              $('.resumable-file-'+file.uniqueIdentifier+' .resumable-file-progress').html('(file could not be uploaded: '+message+')');
+            });
+          r.on('fileProgress', function(file){
+              // Handle progress for both the file and the overall upload
+              $('.resumable-file-'+file.uniqueIdentifier+' .resumable-file-progress').html(Math.floor(file.progress()*100) + '%');
+              $('.progress-bar').css({width:Math.floor(r.progress()*100) + '%'});
+            });
+          r.on('cancel', function(){
+            $('.resumable-file-progress').html('canceled');
+          });
+          r.on('uploadStart', function(){
+              // Show pause, hide resume
+              $('.resumable-progress .progress-resume-link').hide();
+              $('.resumable-progress .progress-pause-link').show();
+          });
+        }
+      </script>
+	
+	<div class="filemanager" style="margin-top: 25px; text-align: center">
+
+		<ul class="data" ></ul>
+
+	</div>
+
+
+
+<!-- The Modal -->
+  <div class="modal fade" id="myModal" >
+    <div class="modal-dialog  modal-lg">
+      <div class="modal-content">
+      
+        <!-- Modal Header -->
+        <div class="modal-header" style="border: none">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body" >
+		<p id="fillModal"><p>
+        </div>
+                
+      </div>
+    </div>
+  </div>
+
+ </div>
+
+<!-- The Modal -->
+  <div class="modal fade" id="myModalPics" >
+    <div class="modal-dialog  modal-lg">
+      <div class="modal-content">
+      
+          
+        <!-- Modal body -->
+        <div class="modal-body" >
+          	<div id="carousel-example-generic" class="carousel slide" data-ride="carousel" >
+  			<!-- Indicators -->
+  			<ol class="carousel-indicators"></ol>
+  			<!-- Wrapper for slides -->
+			
+  			<div class="carousel-inner" ></div>
+			
+  			<!-- Controls -->
+  			<a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+    				<span class="glyphicon glyphicon-chevron-left"></span>
+  			</a>
+  			<a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+    				<span class="glyphicon glyphicon-chevron-right"></span>
+				
+  			</a>
+			
+		</div>
+        </div>
+                
+      </div>
+    </div>
+  </div>
+
+
+
+	
+	<!-- Include our script files -->
+	
+	<script src="assets/js/script.js"></script>
+	<script src="assets/js/bootstrap.min.js"></script>
+
+<script>
+ $(document).ready(function() {  
+  		 $("#carousel-example-generic").swiperight(function() {  
+    		  $(this).carousel('prev');  
+	    		});  
+		   $("#carousel-example-generic").swipeleft(function() {  
+		      $(this).carousel('next');  
+	   });  
+	}); 
+
+</script>
+
+
+<script>
+function goBack() {
+    window.history.back();
+}
+</script>
+
+
+</div>
+</div>
+</div>
+
+</body>
+</html>
